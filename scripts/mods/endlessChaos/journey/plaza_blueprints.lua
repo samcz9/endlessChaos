@@ -1,119 +1,19 @@
-local mod = get_mod("endlessChaos")
+-- Runs on: HOST (terror events only execute on the server).
+-- Fortunes of War ("plaza") wave blueprints used by the Risk of Rats arena level keys.
+-- Based on the vanilla plaza waves with a higher active-enemy freeze limit.
 
 local function num_spawned_enemies()
-	local spawned_enemies = Managers.state.conflict:spawned_units()
+	local spawned_enemies = Managers.state.conflict:spawned_enemies()
 
 	return #spawned_enemies
 end
-
-RISK_OF_RATS_GRUDGES = {
-	normal = {
-		[0] = 0,
-		[5.0] = 1,
-		[10.0] = 2,
-		[15.0] = 3,
-		[20.0] = 5
-	},
-	hard = {
-		[0] = 1,
-		[5.0] = 2,
-		[10.0] = 2,
-		[15.0] = 3,
-		[20.0] = 5
-	},
-	harder = {
-		[0] = 1,
-		[5.0] = 2,
-		[10.0] = 2,
-		[15.0] = 3,
-		[20.0] = 5
-	},
-	hardest = {
-		[0] = 2,
-		[5.0] = 3,
-		[10.0] = 3,
-		[15.0] = 5,
-		[20.0] = 8
-	},
-	cataclysm = {
-		[0] = 2,
-		[5.0] = 3,
-		[10.0] = 3,
-		[15.0] = 5,
-		[20.0] = 8
-	},
-	cataclysm_2 = {
-		[0] = 2,
-		[5.0] = 3,
-		[10.0] = 3,
-		[15.0] = 5,
-		[20.0] = 8
-	},
-	cataclysm_3 = {
-		[0] = 2,
-		[5.0] = 3,
-		[10.0] = 3,
-		[15.0] = 5,
-		[20.0] = 8
-	},
-	default = {}
-}
-
-local function nearest_table_value(difficulty, difficulty_tweak, table)
-	local difficulty_table = table[difficulty]
-
-	--[[
-	
-	if difficulty_table then
-		for i = difficulty_tweak, -tweak_range, -1 do
-			local val = difficulty_table[i]
-
-			if val then
-				return val
-			end
-		end
-	end
-	
-	]]--
-
-	return 3
-end
-
-local function add_grudge_marks(optional_data, difficulty, breed_name, event, difficulty_tweak)
-	optional_data = optional_data or {}
-	local num_enhancements = nearest_table_value(difficulty, difficulty_tweak, RISK_OF_RATS_GRUDGES) or 0
-	if num_enhancements > 0 then
-		return TerrorEventUtils.add_enhancements_to_spawn_data(optional_data, num_enhancements, breed_name)
-	end
-end
-
-common_breeds = {}
-elite_breeds = {}
-boss_breeds = {}
-specials = {}
-
-for breed_name, breed_data in ipairs(Breeds) do
-	if breed.boss then
-		boss_breeds[#boss_breeds + 1] = breed_name
-	elseif breed.special then
-		specials[#specials + 1] = breed_name
-	elseif breed.elite then
-		elite_breeds[#elite_breeds + 1] = breed_name
-	else
-		common_breeds[#common_breeds + 1] = breed_data
-	end
-end
-
-
 
 local NORMAL = 2
 local HARD = 3
 local HARDER = 4
 local HARDEST = 5
 local CATACLYSM = 6
-local weighted_random_terror_events = nil
-local boss_pre_spawn_func = nil
-boss_pre_spawn_func = TerrorEventUtils.add_enhancements_for_difficulty
+local boss_pre_spawn_func = TerrorEventUtils.add_enhancements_for_difficulty
 
 local terror_event_blueprints = {
 	plaza_disable_pacing = {
@@ -2779,4 +2679,4 @@ local terror_event_blueprints = {
 	}
 }
 
-return terror_event_blueprints, weighted_random_terror_events
+return terror_event_blueprints

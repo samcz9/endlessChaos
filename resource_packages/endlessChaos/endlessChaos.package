@@ -8,4 +8,7 @@ package = [
 
 lua = [
 	"scripts/mods/endlessChaos/*"
+	"scripts/mods/endlessChaos/core/*"
+	"scripts/mods/endlessChaos/journey/*"
+	"scripts/mods/endlessChaos/boons/*"
 ]

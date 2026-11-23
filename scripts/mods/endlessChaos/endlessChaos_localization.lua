@@ -44,7 +44,7 @@ return {
 	endless_chaos_buff_pickup_unique ={
 		en = "Unique Buff"
 	},
-	endless_chaos_buff_pickup_exotic_hud_desc ={
+	endless_chaos_buff_pickup_unique_hud_desc ={
 		en = "Random Boon"
 	}
 }
