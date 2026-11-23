@@ -136,7 +136,7 @@ Elapsed time comes from `Managers.time:time("game")` and is read **on the host o
   buff_ext:add_buff("grudge_mark_damage", { external_optional_multiplier = damage_mult - 1 })  -- damage_dealt stat
   ```
 
-- `ai_update_max_health` → `set_max_health` reaches clients through the game-object field (fresh spawn) or `rpc_sync_damage_taken` (unfreeze). Clients see the correct health bar with nothing extra from us.
+- `set_max_health` sends the new max health to connected clients with `rpc_sync_damage_taken` (fresh spawns and unfreezes). The game-object `health` field keeps the unscaled spawn value and vanilla hot-join sync only sends damage, so the host also re-sends max health to joining players.
 - `damage_dealt` is only read in the host's `apply_buffs_to_damage`. Nothing to sync.
 - Clamp `health_mult * base` below `min(NetworkConstants.health.max, NetworkConstants.damage_hotjoin_sync.max)`. Past that point, add `damage_taken` reduction instead, so enemies keep getting tankier without overflowing the network type.
 - **No more edits to `Breeds` and no `calculate_damage` hook.**
@@ -258,7 +258,13 @@ Open:
 
 ## 9. Milestones
 
-> **Milestone 1 status (2026-11-22):** code written and statically checked, **not yet tested in-game**.
+> **Milestone 2 status (2026-11-22):** code written and statically checked, **not yet tested in-game**.
+> - `scaling/difficulty.lua`: host coefficient from arena time and cleared waves (counted from the plaza `wave_N_complete` flow events), broadcast to clients every 2s for display.
+> - `scaling/enemy_scaling.lua`: hooks `ConflictDirector._post_spawn_unit` (fresh and recycled units) and adds the mod's own buff templates locally on the host: `max_health` (applied like vanilla `belakor_shadow_lieutenant`, on top of the current max), `damage_dealt`, and `damage_taken` for health that would exceed the network limit. Pets on the heroes side are skipped. Vanilla hot-join sync does not send max health, so the host re-sends it to joining players (hook on `HealthSystem.hot_join_sync`).
+> - Commands: `/ec_scaling` (coefficient, multipliers, `NetworkConstants` limits), `/ec_addtime <min>` and `/ec_setwave <n>` (host debug).
+> - Tunables (to balance): `TIME_FACTOR` 0.03–0.08 per minute by difficulty, `WAVE_FACTOR` 1.1, health weight 1, damage weight 0.5.
+>
+> **Milestone 1 status (2026-11-22):** tested in-game and working.
 > Beyond bugs 1–10, it also fixes:
 > - `num_spawned_enemies` called the nonexistent `ConflictDirector:spawned_units()`, a host error at the first wave wait.
 > - The journey leaked into Chaos Wastes quickplay, the public lobby browser, and the weekly Belakor rotation (all three iterate `AvailableJourneyOrder`).
@@ -266,7 +272,7 @@ Open:
 > - The old `givebuff` command referenced a boon (`deus_extra_shot`) that no longer exists.
 > - Boon caps above 1 were never enforced. A reroll in `grant.lua` now enforces them.
 >
-> Enemy scaling is **removed** until milestone 2.
+> Milestone 1 removed the old enemy scaling; milestone 2 replaced it.
 
 1. **Stabilize (no new features).**
    - Fix bugs 1–10.
